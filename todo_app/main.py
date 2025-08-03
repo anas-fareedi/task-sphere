@@ -6,8 +6,8 @@ from datetime import datetime
 # from database import engine
 # from routers import auth,users,admin,todos
 
-
 app=FastAPI()
+
 
 class TodoCreate(BaseModel):
     title: str
