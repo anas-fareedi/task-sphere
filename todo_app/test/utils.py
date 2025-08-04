@@ -2,7 +2,7 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.pool import StaticPool
 from sqlalchemy.orm import sessionmaker
 from ..database import Base
-from ..main import app
+from todo_app.main import app
 from fastapi.testclient import TestClient
 import pytest
 from ..models import Todos, Users
