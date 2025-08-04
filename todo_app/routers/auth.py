@@ -1,6 +1,6 @@
 from datetime import timedelta, datetime, timezone
 from typing import Annotated
-from fastapi import APIRouter, Depends, HTTPException,status
+from fastapi import APIRouter, Depends, HTTPException, Request,status
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from starlette import status
@@ -9,6 +9,7 @@ from ..models import Users
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from jose import jwt, JWTError
+from ..rate_limiter import limiter
 # from fastapi.templating import Jinja2Templates
 
 router = APIRouter(
@@ -94,7 +95,8 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-async def create_user(db: db_dependency,
+@limiter.limit("10/minute") 
+async def create_user(request: Request,db: db_dependency,
                       create_user_request: CreateUserRequest):
     create_user_model = Users(
         email=create_user_request.email,
@@ -112,7 +114,8 @@ async def create_user(db: db_dependency,
 
 
 @router.post("/token", response_model=Token)
-async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+@limiter.limit("10/minute") 
+async def login_for_access_token(request: Request,form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
                                  db: db_dependency):
     user = authenticate_user(form_data.username, form_data.password, db)
     if not user:
