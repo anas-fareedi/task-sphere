@@ -23,10 +23,16 @@ app.add_exception_handler(RateLimitExceeded, rate_limit_handler)
 Base.metadata.create_all(bind=engine)
 
 
+app.mount("/static", StaticFiles(directory="todo_app/static"), name="static")
+
+@app.get("/")
+def test(request: Request):
+    return RedirectResponse(url="/todos/todo-page", status_code=status.HTTP_302_FOUND)
+
+
 # @app.get("/")
 # def test(request: Request):
 #     return RedirectResponse(url="/todos/todo-page", status_code=status.HTTP_302_FOUND)
-
 
 # app.add_middleware(
 #     CORSMiddleware,
@@ -35,8 +41,6 @@ Base.metadata.create_all(bind=engine)
 #     allow_methods=["*"],
 #     allow_headers=["*"],
 # )
-
-# app.mount("/static", StaticFiles(directory="frontend-todo"), name="static")
 
 # @app.get("/", include_in_schema=False)
 # @limiter.exempt
@@ -57,10 +61,10 @@ def root():
         }
     }
 
-# @app.get("/healthy")
-# @limiter.exempt
-# def health_check():
-#     return {'status': 'Healthy'}
+@app.get("/healthy")
+@limiter.exempt
+def health_check():
+    return {'status': 'Healthy'}
 
 
 app.include_router(auth.router)
