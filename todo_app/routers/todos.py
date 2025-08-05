@@ -11,9 +11,9 @@ from starlette.responses import RedirectResponse
 from ..rate_limiter import limiter 
 from typing import List
 
-# from fastapi.templating import Jinja2Templates
+from fastapi.templating import Jinja2Templates
 
-# templates = Jinja2Templates(directory="TodoApp/templates")
+templates = Jinja2Templates(directory="todo_app/templates")
 
 router = APIRouter(
     prefix='/todos',
@@ -57,58 +57,58 @@ class TodoOut(BaseModel):
         orm_mode = True
 
         
-# def redirect_to_login():
-#     redirect_response = RedirectResponse(url="/auth/login-page", status_code=status.HTTP_302_FOUND)
-#     redirect_response.delete_cookie(key="access_token")
-#     return redirect_response
+def redirect_to_login():
+    redirect_response = RedirectResponse(url="/auth/login-page", status_code=status.HTTP_302_FOUND)
+    redirect_response.delete_cookie(key="access_token")
+    return redirect_response
 
 
-### Pages ###
+## Pages ###
 
-# @router.get("/todo-page")
-# async def render_todo_page(request: Request, db: db_dependency):
-#     try:
-#         user = await get_current_user(request.cookies.get('access_token'))
+@router.get("/todo-page")
+async def render_todo_page(request: Request, db: db_dependency):
+    try:
+        user = await get_current_user(request.cookies.get('access_token'))
 
-#         if user is None:
-#             return redirect_to_login()
+        if user is None:
+            return redirect_to_login()
 
-#         todos = db.query(Todos).filter(Todos.owner_id == user.get("id")).all()
+        todos = db.query(Todos).filter(Todos.owner_id == user.get("id")).all()
 
-#         # return templates.TemplateResponse("todo.html", {"request": request, "todos": todos, "user": user})
+        return templates.TemplateResponse("todo.html", {"request": request, "todos": todos, "user": user})
 
-#     except:
-#         return redirect_to_login()
-
-
-# @router.get('/add-todo-page')
-# async def render_todo_page(request: Request):
-#     try:
-#         user = await get_current_user(request.cookies.get('access_token'))
-
-#         if user is None:
-#             return redirect_to_login()
-
-#         return templates.TemplateResponse("add-todo.html", {"request": request, "user": user})
-
-#     except:
-#         return redirect_to_login()
+    except:
+        return redirect_to_login()
 
 
-# @router.get("/edit-todo-page/{todo_id}")
-# async def render_edit_todo_page(request: Request, todo_id: int, db: db_dependency):
-#     try:
-#         user = await get_current_user(request.cookies.get('access_token'))
+@router.get('/add-todo-page')
+async def render_todo_page(request: Request):
+    try:
+        user = await get_current_user(request.cookies.get('access_token'))
 
-#         if user is None:
-#             return redirect_to_login()
+        if user is None:
+            return redirect_to_login()
 
-#         todo = db.query(Todos).filter(Todos.id == todo_id).first()
+        return templates.TemplateResponse("add-todo.html", {"request": request, "user": user})
 
-#         return templates.TemplateResponse("edit-todo.html", {"request": request, "todo": todo, "user": user})
+    except:
+        return redirect_to_login()
 
-#     except:
-#         return redirect_to_login()
+
+@router.get("/edit-todo-page/{todo_id}")
+async def render_edit_todo_page(request: Request, todo_id: int, db: db_dependency):
+    try:
+        user = await get_current_user(request.cookies.get('access_token'))
+
+        if user is None:
+            return redirect_to_login()
+
+        todo = db.query(Todos).filter(Todos.id == todo_id).first()
+
+        return templates.TemplateResponse("edit-todo.html", {"request": request, "todo": todo, "user": user})
+
+    except:
+        return redirect_to_login()
 
 ### Endpoints ###
 
