@@ -124,4 +124,3 @@ async def login_for_access_token(request: Request,form_data: Annotated[OAuth2Pas
     token = create_access_token(user.username, user.id, user.role, timedelta(minutes=20))
 
     return {'access_token': token, 'token_type': 'bearer'}
-
