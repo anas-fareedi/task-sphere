@@ -1,0 +1,27 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:14
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: anas0411
+      POSTGRES_DB: todo_prac_db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  fastapi:
+    build:
+      context: .
+    container_name: fastapi_app
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://postgres:anas0411@db:5432/todo_prac_db
+    ports:
+      - "8000:8000"
